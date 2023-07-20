@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>My Website</title>
+    <meta charset="utf-8">
+    <meta http-equiv=X-UA-Compatible content="IE=edge">
+    <meta name=viewport content="width=device-width, initial-scale=1.0">
+    
+    <!-- <link href="//fonts.googleapis.com/css?family=Roboto" rel=stylesheet> -->
+    <link rel="stylesheet" href="/myapp/css/style.css">
+    <link rel="stylesheet" href="/myapp/css/font-Roboto.css">
+    <link rel="stylesheet" href="/myapp/css/font-OpenSans.css">
+
+    <script src="/myapp/lib/fontawesome.js"></script>
+    <script src="/myapp/lib/bcryptjs-2.4.3.min.js"></script>
+    <script src="/myapp/lib/angularjs-1.8.2.min.js"></script>
+    <script src="/myapp/lib/angularjs-route.min.js"></script>
+    <script src="/myapp/lib/chart-2.9.4.js"></script>
+    <script src="/myapp/lib/tailwindcss.js"></script>
+    <script src="/myapp/lib/math-11.9.0.js"></script>
+    <!-- <script src="/myapp/lib/chartjs-2.9.4.js"></script> -->
+    
+    <script src="/myapp/app/app.js"></script>
+    <script src="/myapp/app/base/header.js"></script>
+    <script src="/myapp/app/base/footer.js"></script>
+
+    <script src="/myapp/app/controller/login.js"></script>
+    <script src="/myapp/app/controller/home.js"></script>
+    <script src="/myapp/app/controller/admin.js"></script>
+    <script src="/myapp/app/controller/products.js"></script>
+    
+    <script src="/myapp/app/controller/user.js"></script>
+</head>
+
+<body data-ng-app='cfshop'>
+    <header-component login="login"></header-component>
+
+    <div class="mt-8 py-4" ng-view></div>
+
+    <footer-component></footer-component>
+</body>
+
+</html>
+
+<script type="text/javascript">
+    var config ={
+        baseLocation: "/myapp/app/base",
+        controllerLocation: "/myapp/app/controller",
+        viewLocation: "/myapp/app/view"
+    }
+</script>
