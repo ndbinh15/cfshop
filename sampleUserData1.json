@@ -1,0 +1,26 @@
+[
+  {
+    "name": "John Doe",
+    "username": "johndoe",
+    "email": "john@example.com",
+    "phonenumber": "1234567890",
+    "address": "123 Street, City, Country",
+    "password": "$2a$10$KmCvBOdxDHU21eUPg44cm.62aaDrrB.3S5jGey0U8cZuKSHMlo6m2"
+  },
+  {
+    "name": "Jane Smith",
+    "username": "janesmith",
+    "email": "jane@example.com",
+    "phonenumber": "9876543210",
+    "address": "456 Avenue, City, Country",
+    "password": "$2a$10$KmCvBOdxDHU21eUPg44cm.62aaDrrB.3S5jGey0U8cZuKSHMlo6m2"
+  },
+  {
+    "name": "Mike Johnson",
+    "username": "mikejohnson",
+    "email": "mike@example.com",
+    "phonenumber": "5555555555",
+    "address": "789 Road, City, Country",
+    "password": "$2a$10$KmCvBOdxDHU21eUPg44cm.62aaDrrB.3S5jGey0U8cZuKSHMlo6m2"
+  }
+]
