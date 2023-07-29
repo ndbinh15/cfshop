@@ -19,14 +19,14 @@ type Product struct {
 	Price        float64            `json:"price"`
 	Ingredients  []string           `json:"ingredients"`
 	Availability bool               `json:"availability"`
-	Category     Category           `json:"category"`
+	Category     string             `json:"category"`
 }
 
 // Insert a new product
 func InsertProduct(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		http.Error(w, "Method InsertProduct not allowed", http.StatusMethodNotAllowed)
 		return
 	} else {
 		log.Println("$POST add product success")
@@ -51,16 +51,22 @@ func InsertProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Return a success response
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	response := map[string]interface{}{
+		"success": true,
+		"message": "Product created successfully",
+	}
+	json.NewEncoder(w).Encode(response)
 }
 
 func GetAllProducts(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "GET" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		http.Error(w, "Method GetAllProducts not allowed", http.StatusMethodNotAllowed)
 		return
 	} else {
-		log.Println("$GET product success")
+		log.Println("$GET all product success")
 	}
 	// Get the MongoDB collection for products
 	productCollection := db.GetProductCollection()
@@ -98,15 +104,38 @@ func GetAllProducts(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Find a product by ID
-func FindProductByID(client *mongo.Client, productID primitive.ObjectID) (*Product, error) {
-	collection := client.Database("myDatabase").Collection("products")
-	var product Product
-	err := collection.FindOne(context.TODO(), bson.M{"_id": productID}).Decode(&product)
-	if err != nil {
-		return nil, err
+func GetProductCount(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != "GET" {
+		http.Error(w, "Method GetProductCount not allowed", http.StatusMethodNotAllowed)
+		return
+	} else {
+		log.Println("$GET product count success")
 	}
-	return &product, nil
+	// Get the MongoDB collection for products
+	productCollection := db.GetProductCollection()
+
+	// Query the database for the count of all products
+	count, err := productCollection.CountDocuments(r.Context(), bson.M{})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Create a JSON response containing the count
+	response := struct {
+		Count int64 `json:"count"`
+	}{
+		Count: count,
+	}
+
+	// Encode the response as JSON and send it back
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 // Update a product

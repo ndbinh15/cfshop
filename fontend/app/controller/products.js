@@ -1,41 +1,75 @@
 angular.module('cfshop')
-    .controller('productController', ['$scope', '$http', function ($scope, $http) {
-        // add product
-        $scope.product = {};
+    .controller('productController', ['$scope', '$http', '$timeout','$window', function ($scope, $http, $timeout,$window) {
+        $scope.linkAdminProducts = "/home/admin/products";
+        $scope.linkAdminUsers = "/home/admin/users";
+        $scope.linkAdminOrders = "/home/admin/orders";
+        $scope.linkAdminHome = "/home/admin";
 
-        $scope.createProduct = function () {
-            $http
-                .post('/home/admin/products/add', $scope.product)
+        //refresh
+        $scope.refreshPage = function () {
+            $timeout(function () {
+                $window.location.reload();
+            }, 1000);
+          }
+
+        // count product
+        $scope.countProducts = function () {
+            $http.get('/home/admin/products/count')
                 .then(function (response) {
-                    console.log(response)
-                    if (response.status == 201) {
-                        console.log("create success")
-                        $scope.product = {};
+                    $scope.countProducts = response.data;
+
+                })
+                .catch(function (error) {
+                    console.error('Error count products:', error);
+                });
+        };
+        $timeout(function () {
+            $scope.countProducts();
+        }, 1000);
+
+        // add product
+        $scope.successNoti = false;
+        $scope.errorNoti = false;
+        $scope.product = {};
+        $scope.createProduct = function () {
+            $http.post('/home/admin/products/add', $scope.product)
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data && response.data.success) {
+                        $scope.successMess = "Product created successfully";
+                        $scope.product = {}; // Clear the form fields
+                        $scope.successNoti = true;
                     } else {
-                        console.log("fail")
+                        $scope.errorNoti = true;
+                        $scope.errorMess = "Failed to create product:" + response.data.message;
                     }
                 })
                 .catch(function (error) {
-                    console.error('Error creating product:', error);
+                    $scope.errorNoti = true;
+                    $scope.errorMess = 'Error creating product:' + error;
                 });
+            $timeout(function () {
+                $scope.successNoti = false;
+                $scope.errorNoti = false;
+            }, 3000);
         };
 
-        // show product
-        // $scope.readProducts = [];
 
-        // $scope.getProducts = function () {
-        //     $http
-        //         .get('/home/admin/products/show')
-        //         .then(function (response) {
-        //             console.log(response.data)
-        //             $scope.readProducts = response.data;
-        //         })
-        //         .catch(function (error) {
-        //             console.error('Error retrieving products:', error);
-        //         });
-        // };
+        //get category
+        $scope.getCategories = function () {
+            $http
+                .get('/products/categories/get')
+                .then(function (response) {
+                    console.log(response)
+                    $scope.categories = response.data;
 
-        //
+                })
+                .catch(function (error) {
+                    console.error('Error get categories:', error);
+                });
+        }
+
+        //show 5 products per page
         $scope.readProducts = [];
         $scope.displayedProducts = [];
         $scope.itemsPerPage = 5;
@@ -61,7 +95,6 @@ angular.module('cfshop')
 
         $scope.updateDisplayedProducts = function () {
             const startIndex = math.multiply(math.subtract($scope.currentPage, 1), $scope.itemsPerPage);
-            console.log(startIndex)
             const endIndex = startIndex + $scope.itemsPerPage;
             $scope.displayedProducts = $scope.readProducts.slice(startIndex, endIndex);
         };
@@ -81,17 +114,20 @@ angular.module('cfshop')
         };
 
         //nav bar
-        $scope.openNav = function () {
-            document.getElementById("mySidenav").style.width = "250px";
-            document.getElementById("main").style.marginLeft = "250px";
-            document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
+        $scope.navChoose = false;
+        $scope.contactNav = function () {
+            $scope.navChoose = !$scope.navChoose;
+            console.log($scope.navChoose)
+            if ($scope.navChoose === true) {
+                document.getElementById("mySidenav").style.width = "250px";
+                document.getElementById("main").style.marginLeft = "250px";
+                document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
+            } else {
+                document.getElementById("mySidenav").style.width = "0";
+                document.getElementById("main").style.marginLeft = "0";
+                document.body.style.backgroundColor = "white";
+            }
         };
-
-        $scope.closeNav = function () {
-            document.getElementById("mySidenav").style.width = "0";
-            document.getElementById("main").style.marginLeft = "0";
-            document.body.style.backgroundColor = "white";
-        }
 
         //on click action
         $scope.isHiddenShow = true;
@@ -109,6 +145,7 @@ angular.module('cfshop')
             $scope.isHiddenShow = true;
             $scope.isHiddenUpdate = true;
             $scope.isHiddenDelete = true;
+            $scope.getCategories();
         }
         $scope.isHiddenUpdate = true;
         $scope.openUpdate = function () {

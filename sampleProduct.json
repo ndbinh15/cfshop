@@ -4,6 +4,7 @@
       "description": "A strong concentrated coffee brewed by forcing hot water under pressure through finely ground coffee.",
       "price": 2.99,
       "ingredients": ["Coffee", "Water"],
+      "category": "Hot Coffee",
       "availability": true
     },
     {
@@ -11,6 +12,7 @@
       "description": "An espresso-based coffee drink topped with foamed milk.",
       "price": 3.49,
       "ingredients": ["Espresso", "Milk", "Foam"],
+      "category": "Iced Coffee",
       "availability": true
     },
     {
@@ -18,6 +20,7 @@
       "description": "A coffee drink made with espresso and steamed milk.",
       "price": 3.99,
       "ingredients": ["Espresso", "Milk"],
+      "category": "Specialty Coffee",
       "availability": true
     }
   ]

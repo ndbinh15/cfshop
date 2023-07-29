@@ -8,15 +8,25 @@
       </div>
 
       <div class="mb-4">
-        <input type="password" ng-model="password" placeholder="Password" class="w-full px-4 py-2 border rounded" required>
+        <input type="password" ng-model="password" placeholder="Password" class="w-full px-4 py-2 border rounded"
+          required>
+      </div>
+
+      <div class="flex mt-2 mb-2">
+        <a href="/forgotpss" class="flex-1 text-left">Forgot Password?</a>
+        <a href="#" class="flex-1 text-right">Create New Account</a>
       </div>
 
       <div class="text-center">
-        <input type="submit" value="Login" class="px-4 py-2 text-white bg-zinc-500 rounded cursor-pointer hover:bg-green-600">
+        <input type="submit" value="Login"
+          class="px-4 py-2 text-white bg-zinc-500 rounded cursor-pointer hover:bg-green-600">
       </div>
     </form>
 
-    <p ng-if="error != null" class="text-center mt-3 text-red-500">{{ error }}</p>
-    <p ng-if="success != null" class="text-center mt-3 text-green-500">{{ success }}</p>
+    <div>
+      <p ng-if="error != null" class="text-center mt-3 text-red-500">{{ error }}</p>
+      <p ng-if="success != null" class="text-center mt-3 text-green-500">{{ success }}</p>
+    </div>
+
   </div>
 </div>
