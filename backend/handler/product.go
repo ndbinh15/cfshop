@@ -2,14 +2,12 @@ package handler
 
 import (
 	"cfshop/backend/db"
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Product struct {
@@ -17,9 +15,11 @@ type Product struct {
 	Name         string             `json:"name"`
 	Description  string             `json:"description"`
 	Price        float64            `json:"price"`
+	Quantity     int64              `json:"quantity"`
 	Ingredients  []string           `json:"ingredients"`
 	Availability bool               `json:"availability"`
 	Category     string             `json:"category"`
+	Image        string             `json:"image"`
 }
 
 // Insert a new product
@@ -38,6 +38,14 @@ func InsertProduct(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
+	}
+
+	if product.Quantity == 0 {
+		product.Quantity = 0
+	}
+
+	if product.Image == "" {
+		product.Image = "default.jpg"
 	}
 
 	// Get the MongoDB collection for products
@@ -102,6 +110,15 @@ func GetAllProducts(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// // Return a success response
+	// w.Header().Set("Content-Type", "application/json")
+	// w.WriteHeader(http.StatusCreated)
+	// response := map[string]interface{}{
+	// 	"success": true,
+	// 	"message": "Product created successfully",
+	// }
+	// json.NewEncoder(w).Encode(response)
 }
 
 func GetProductCount(w http.ResponseWriter, r *http.Request) {
@@ -136,18 +153,103 @@ func GetProductCount(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// // Return a success response
+	// w.Header().Set("Content-Type", "application/json")
+	// w.WriteHeader(http.StatusCreated)
+	// response := map[string]interface{}{
+	// 	"success": true,
+	// 	"message": "Product created successfully",
+	// }
+	// json.NewEncoder(w).Encode(response)
 }
 
-// Update a product
-func UpdateProduct(client *mongo.Client, productID primitive.ObjectID, updatedProduct Product) error {
-	collection := client.Database("myDatabase").Collection("products")
-	_, err := collection.UpdateOne(context.TODO(), bson.M{"_id": productID}, bson.M{"$set": updatedProduct})
-	return err
+func UpdateProductQuantity(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != "POST" {
+		http.Error(w, "Method UpdateProductQuantity not allowed", http.StatusMethodNotAllowed)
+		return
+	} else {
+		log.Println("$POST UpdateProductQuantity success")
+	}
+
+	// Parse the request body to get the JSON data
+	var product Product
+	err := json.NewDecoder(r.Body).Decode(&product)
+	if err != nil {
+		log.Println("error decode")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Get the MongoDB collection for products
+	productCollection := db.GetProductCollection()
+
+	// Check if the product exists based on its name
+	filter := bson.M{"name": product.Name}
+	log.Println(filter)
+	existingProduct := productCollection.FindOne(r.Context(), filter)
+
+	if existingProduct.Err() == nil {
+		update := bson.M{"$set": bson.M{"quantity": product.Quantity}}
+		_, err := productCollection.UpdateOne(r.Context(), filter, update)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		log.Println("error found")
+		http.Error(w, "Product not found", http.StatusNotFound)
+		return
+	}
+
+	// w.WriteHeader(http.StatusOK)
+	// Return a success response
+	w.Header().Set("Content-Type", "application/json")
+	log.Println("error 1")
+	w.WriteHeader(http.StatusOK)
+	log.Println("error 2")
+	response := map[string]interface{}{
+		"success": true,
+		"message": "Add product's quantity successfully",
+	}
+	json.NewEncoder(w).Encode(response)
 }
 
-// Delete a product
-func DeleteProduct(client *mongo.Client, productID primitive.ObjectID) error {
-	collection := client.Database("myDatabase").Collection("products")
-	_, err := collection.DeleteOne(context.TODO(), bson.M{"_id": productID})
-	return err
+func DeleteProduct(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method DeleteProduct not allowed", http.StatusMethodNotAllowed)
+		return
+	} else {
+		log.Println("$POST DeleteProduct success")
+	}
+
+	var request struct {
+		Name string `json:"name"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	productCollection := db.GetProductCollection()
+
+	filter := bson.M{"name": request.Name}
+	log.Println(request.Name)
+	log.Println(filter)
+	log.Println(productCollection.DeleteOne(r.Context(), filter))
+	_, err = productCollection.DeleteOne(r.Context(), filter)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	response := map[string]interface{}{
+		"success": true,
+		"message": "Product deleted successfully",
+	}
+	json.NewEncoder(w).Encode(response)
 }

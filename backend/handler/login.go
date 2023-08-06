@@ -33,8 +33,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	username := loginRequest.Username
 	password := loginRequest.Password
 
-	log.Print(username)
-	log.Print(password)
 	err = AuthenticateUser(username, password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)

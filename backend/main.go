@@ -12,17 +12,21 @@ func main() {
 	db.ConnectDB()
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "../fontend/index.html")
+		http.ServeFile(w, r, "../frontend/index.html")
 	})
 
-	http.HandleFunc("/login", handler.Login)
+	http.HandleFunc("/login/login", handler.Login)
 
-	http.Handle("/myapp/", http.StripPrefix("/myapp/", http.FileServer(http.Dir("../fontend"))))
+	http.Handle("/myapp/", http.StripPrefix("/myapp/", http.FileServer(http.Dir("../frontend"))))
 	http.Handle("/image/", http.StripPrefix("/image/", http.FileServer(http.Dir("../img"))))
 
-	http.HandleFunc("/home/admin/products/count", handler.GetProductCount)
-	http.HandleFunc("/home/admin/products/add", handler.InsertProduct)
-	http.HandleFunc("/home/admin/products/show", handler.GetAllProducts)
+	http.HandleFunc("/products/count", handler.GetProductCount)
+	http.HandleFunc("/products/add", handler.InsertProduct)
+	http.HandleFunc("/products/addQuantity", handler.UpdateProductQuantity)
+	http.HandleFunc("/products/get", handler.GetAllProducts)
+	http.HandleFunc("/products/delete", handler.DeleteProduct)
+
+	http.HandleFunc("/user/register", handler.CreateUser)
 
 	http.HandleFunc("/products/categories/get", handler.GetAllCategory)
 

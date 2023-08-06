@@ -1,0 +1,103 @@
+<div ng-controller="adminController">
+
+    <!-- navbar -->
+    <div id="mySidenav"
+         class="h-full bg-black text-white w-0 fixed z-1 top-0 left-0 transition-all duration-500 overflow-x-hidden">
+        <a class='absolute top-0 right-4 text-3xl ml-12 transition-colors duration-300 hover:text-red-500 cursor-pointer'
+           ng-click="contactNav()">&times;</a>
+        <br>
+        <a ng-href="{{linkAdminProducts}}"
+           class="px-8 py-8 text-lg block text-gray-300 transition-colors duration-300 hover:text-cyan-500">Products</a>
+        <a ng-href="{{linkAdminUsers}}"
+           class="px-8 py-8 text-lg block text-gray-300 transition-colors duration-300 hover:text-cyan-500">Users</a>
+        <a ng-href="{{linkAdminOrders}}"
+           class="px-8 py-8 text-lg block text-gray-300 transition-colors duration-300 hover:text-cyan-500">Orders</a>
+        <a ng-href="{{linkAdminHome}}"
+           class="px-8 py-8 text-lg block text-gray-300 transition-colors duration-300 hover:text-cyan-500">Admin home</a>
+    </div>
+
+
+
+    <!-- Use any element to open the sidenav -->
+    <div id="main" class="transition-margin-left duration-500 p-5">
+        <!-- Dashboard -->
+        <div class="bg-gray-200">
+            <div class="mx-auto">
+                <div class="flex items-center justify-between py-4">
+                    <div class="flex items-center pointer-events-auto">
+                        <h1 class="text-2xl font-bold cursor-pointer" ng-click="contactNav()"> &#9776; Dashboard</h1>
+                    </div>
+                    <ol class="flex items-center space-x-2 text-sm">
+                        <!-- <li><a href="#" class="text-blue-500">Home</a></li> -->
+                        <li class="text-gray-500">Dashboard</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- show data in box -->
+        <div class="my-4 flex flex-wrap">
+            <div class="w-full lg:w-1/4 px-4 mb-4">
+                <!-- small box -->
+                <div class="bg-blue-500 rounded-lg overflow-hidden border border-blue-700">
+                    <div class="p-4">
+                        <h3 class="text-2xl font-bold text-white">Na/N</h3>
+                        <p class="text-white">New Orders</p>
+                    </div>
+                    <div class="px-4 py-2 bg-white">
+                        <i class="ion ion-bag"></i>
+                        <a ng-href="{{linkAdminOrders}}" class="text-blue-500">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-1/4 px-4 mb-4">
+                <!-- small box -->
+                <div class="bg-orange-500 rounded-lg overflow-hidden border border-blue-700">
+                    <div class="p-4">
+                        <h3 class="text-2xl font-bold text-white" ng-if="countProducts.count">{{countProducts.count}}</h3>
+                        <h3 class="text-2xl font-bold text-white" ng-if="!countProducts.count">0</h3>
+                        <p class="text-white">Products </p>
+                    </div>
+                    <div class="px-4 py-2 bg-white">
+                        <i class="ion ion-bag"></i>
+                        <a ng-href="{{linkAdminProducts}}" class="text-blue-500 ">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-1/4 px-4 mb-4">
+                <!-- small box -->
+                <div class="bg-red-700 rounded-lg overflow-hidden border border-blue-700">
+                    <div class="p-4">
+                        <h3 class="text-2xl font-bold text-white">Na/N</h3>
+                        <p class="text-white">Request Cancel Orders</p>
+                    </div>
+                    <div class="px-4 py-2 bg-white">
+                        <i class="ion ion-bag"></i>
+                        <a href="#" class="text-blue-500">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-1/4 px-4 mb-4">
+                <!-- small box -->
+                <div class="bg-green-500 rounded-lg overflow-hidden border border-blue-700">
+                    <div class="p-4">
+                        <h3 class="text-2xl font-bold text-white">Na/N</h3>
+                        <p class="text-white">Orders Completed</p>
+                    </div>
+                    <div class="px-4 py-2 bg-white">
+                        <i class="ion ion-bag"></i>
+                        <a href="#" class="text-blue-500">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- graph -->
+        <div class="flex justify-center items-center">
+            <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+        </div>
+    </div>
+</div>

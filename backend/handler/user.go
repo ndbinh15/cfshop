@@ -3,8 +3,10 @@ package handler
 import (
 	"cfshop/backend/db"
 	"context"
+	"encoding/json"
 	"errors"
 	"log"
+	"net/http"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -21,50 +23,38 @@ type User struct {
 	Password    string             `bson:"password"`
 }
 
-func CreateUser(user User) (*primitive.ObjectID, error) {
-	collection := db.GetUserCollection()
+func CreateUser(w http.ResponseWriter, r *http.Request) {
 
-	// Hash the password
-	hashedPassword, err := hashPassword(user.Password)
-	if err != nil {
-		log.Println("Failed to hash password:", err)
-		return nil, err
+	if r.Method != "POST" {
+		http.Error(w, "Method CreateUser not allowed", http.StatusMethodNotAllowed)
+		return
+	} else {
+		log.Println("$POST CreateUser success")
 	}
 
-	// Set the hashed password
-	user.Password = hashedPassword
-
-	// Create the user entry
-	result, err := collection.InsertOne(context.TODO(), user)
-	if err != nil {
-		log.Println("Failed to create user:", err)
-		return nil, err
-	}
-
-	id := result.InsertedID.(primitive.ObjectID)
-	user.ID = id
-
-	return &id, nil
-}
-
-func GetUserByID(id string) (*User, error) {
-	collection := db.GetUserCollection()
-
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		log.Println("Invalid object ID:", err)
-		return nil, err
-	}
-
-	filter := bson.M{"_id": objID}
+	// Parse the request body to get the product data
 	var user User
-	err = collection.FindOne(context.TODO(), filter).Decode(&user)
+	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		log.Println("Failed to find user:", err)
-		return nil, err
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
-	return &user, nil
+	userCollection := db.GetUserCollection()
+	_, err = userCollection.InsertOne(r.Context(), user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Return a success response
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	response := map[string]interface{}{
+		"success": true,
+		"message": "User Registered successfully",
+	}
+	json.NewEncoder(w).Encode(response)
 }
 
 func UpdateUser(user User) error {

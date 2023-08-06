@@ -1,0 +1,35 @@
+[
+  {
+    "outputFileName": "frontend/bundle_base.js",
+    "inputFiles": [
+      "frontend/lib/angularjs-route.min.js",
+      "frontend/lib/angularjs-1.8.2.min.js",
+      "frontend/lib/bcryptjs-2.4.3.min.js",
+      "frontend/lib/chart-2.9.4.js",
+      "frontend/lib/fontawesome.js",
+      "frontend/lib/math-11.9.0.js",
+      "frontend/lib/tailwindcss.js",
+
+      "frontend/app/app.js",
+      "frontend/app/base/commingsoon.js",
+      "frontend/app/base/error.js",
+      "frontend/app/base/footer.js",
+      "frontend/app/base/header.js",
+
+      "frontend/app/controller/admin.js",
+      "frontend/app/controller/home.js",
+      "frontend/app/controller/login.js",
+      "frontend/app/controller/product.js",
+      "frontend/app/controller/user.js",
+      "frontend/app/controller/welcome.js"
+    ]
+  },
+  {
+    "outputFileName": "frontend/style.min.css",
+    "inputFiles": [
+      "frontend/css/style.css",
+      "frontend/css/font-OpenSans.css",
+      "frontend/css/font-Roboto.css"
+    ]
+  }
+]
