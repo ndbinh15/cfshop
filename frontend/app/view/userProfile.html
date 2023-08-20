@@ -1,0 +1,74 @@
+<div class="container mx-auto p-8" ng-controller="userProfileController">
+
+    <!--<div class="flex items-center justify-center h-screen" ng-show="errorID">
+        <div class="text-center">
+            <div>
+                <h1 class="text-4xl font-bold mb-4">...LOADING...</h1>
+            </div>
+        </div>
+    </div>-->
+
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Left side -->
+        <div class="md:order-1">
+            <img src="/image/userDefault.jpg" alt="Product Image" class="w-[400px] h-auto text-center">
+        </div>
+
+        <!-- Right side -->
+
+        <div class="md:order-2">
+            <div class="mt-4">
+                <h2 class="text-xl">User Name: {{userInfo.UserName}}</h2>
+            </div>
+            <div class="mt-4">
+                <div>
+                    <h3>ID:</h3>
+                    <p>{{userInfo.ID}}</p>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div>
+                    <h3>Email:</h3>
+                    <p>{{userInfo.Email}}</p>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div>
+                    <h3>Phone Number:</h3>
+                    <p>{{userInfo.PhoneNumber}}</p>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div>
+                    <h2>Address:</h2>
+                    <p>{{userInfo.Address}}</p>
+                </div>
+            </div>
+
+            <!--<div class="mt-4">
+                <h3 class="text-lg font-semibold">Description</h3>
+                <div class="mt-2">
+                    <div class="">
+                        <p class="">{{product.description}}</p>
+                    </div>
+                </div>
+            </div>-->
+            <!--<div class="mt-4">-->
+            <!-- Reviews and Comments Section -->
+            <!--<h3 class="text-lg font-semibold">Ingredients</h3>
+            <div class="mt-2">-->
+            <!-- Individual reviews can be looped here -->
+            <!--<div class="">
+                        <p class="">{{product.indredients}}</p>
+                    </div>
+                </div>
+            </div>-->
+            <!--<div class="mt-4 space-y-3">
+                <button class="w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600">Add to Cart</button>
+                <button class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Buy product</button>
+                <button class="w-full bg-[#744700] text-white py-2 rounded-md hover:bg-[#5d3901]" ng-click="goBackListProduct()">Go back to list product</button>
+            </div>-->
+        </div>
+    </div>
+</div>

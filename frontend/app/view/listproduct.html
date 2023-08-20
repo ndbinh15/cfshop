@@ -1,4 +1,4 @@
-<div class="container mx-auto px-4 py-8" ng-controller="buyproductController">
+<div class="container mx-auto px-4 py-8" ng-controller="listProductController">
     <h2 class="text-3xl font-bold mb-4">Our Menu</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <!-- Product Card 1 -->
@@ -14,7 +14,7 @@
                 </div>
                 <div class="p-4 text-center">
                     <a href="#" type="button">Price: {{product.price}}</a>
-                    <a href="#" type="button" class="hover:text-cyan-700 cursor-pointer">Buy Now</a>
+                    <a href="/home/user/listproduct/product?id={{product._id}}" type="button" class="text-[#744700] hover:text-cyan-700 cursor-pointer">Buy Now</a>
                 </div>
             </div>
         </div>

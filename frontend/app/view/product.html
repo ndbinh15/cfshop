@@ -1,0 +1,86 @@
+<div class="container mx-auto p-8" ng-controller="productController">
+
+    <div class="flex items-center justify-center h-screen" ng-show="errorID">
+        <div class="text-center">
+            <div>
+                <h1 class="text-4xl font-bold mb-4">...LOADING...</h1>  
+            </div>
+        </div>
+    </div>
+
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" ng-hide="errorID">
+        <!-- Left side: Image and Reviews -->
+        <div class="md:order-1">
+            <img src="/image/{{product.image}}" alt="Product Image" class="w-[500px] h-auto">
+            <div class="mt-4">
+                <h2 class="text-xl font-semibold">Product Name: {{product.name}}</h2>
+
+            </div>
+        </div>
+
+        <!-- Right side: Add to Cart -->
+        <div class="md:order-2">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-semibold">{{product.name}}</h2>
+                    <p class="text-gray-600">In Stock: {{product.quantity}}</p>
+                </div>
+                <div class="text-xl font-semibold">${{product.price}}</div> <!-- Replace with actual price -->
+            </div>
+            <div class="mt-4">
+                <!-- Reviews and Comments Section -->
+                <h3 class="text-lg font-semibold">Description</h3>
+                <div class="mt-2">
+                    <!-- Individual reviews can be looped here -->
+                    <div class="">
+                        <p class="">{{product.description}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <!-- Reviews and Comments Section -->
+                <h3 class="text-lg font-semibold">Ingredients</h3>
+                <div class="mt-2">
+                    <!-- Individual reviews can be looped here -->
+                    <div class="">
+                        <p class="">{{product.indredients}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <label for="buyQuantity" class="block text-sm font-medium text-gray-700">Buy Quantity</label>
+                <input type="number" id="buyQuantity" name="buyQuantity" class="w-16 px-2 py-1 border rounded-md focus:ring focus:ring-blue-300" min="1" value="1"
+                       ng-model="buyQuantity" required>
+            </div>
+
+            <div class="mt-4 space-y-3">
+                <button class="w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600" ng-click="addToCart()">Add to Cart</button>
+                <button class="w-full bg-cyan-500 text-white py-2 rounded-md hover:bg-cyan-600" ng-click="goToCart()">Go to Cart</button>
+                <button class="w-full bg-[#744700] text-white py-2 rounded-md hover:bg-[#5d3901]" ng-click="goBackListProduct()">Go back to list product</button>
+            </div>
+            <div class="mt-4">
+                <!-- Reviews and Comments Section -->
+                <h3 class="text-lg font-semibold">Reviews</h3>
+                <div class="mt-2">
+                    <!-- Individual reviews can be looped here -->
+                    <div class="border p-2 rounded-md bg-white">
+                        <p class="text-gray-800">"Great product! I love it."</p>
+                        <p class="text-gray-600">- Reviewer Name</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <div class="alert success bg-green-500 border-l-4 border-green-700 text-white p-4 mb-4"
+                     ng-if="successNoti">
+                    <strong>Success!</strong> {{successMess}}
+                </div>
+                <div class="alert success bg-red-500 border-l-4 border-red-700 text-white p-4 mb-4"
+                     ng-if="errorNoti">
+                    <strong>Error</strong> {{errorMess}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

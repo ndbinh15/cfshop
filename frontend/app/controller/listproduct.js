@@ -1,5 +1,5 @@
 angular.module('cfshop')
-    .controller('buyproductController', ['$scope', '$http', function ($scope, $http) {
+    .controller('listProductController', ['$scope', '$http', function ($scope, $http) {
 
         $scope.readProducts = [];
         $scope.getProducts = function () {

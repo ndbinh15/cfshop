@@ -32,12 +32,12 @@ angular.module('cfshop')
                     .catch(function (error) {
                         console.log(error)
                         $scope.errorNoti = true;
-                        $scope.errorMess = 'Error register user:' + error;
+                        $scope.errorMess = 'Error register user: ' + error.data;
                     });
-                //$timeout(function () {
-                //    $scope.successNoti = false;
-                //    $scope.errorNoti = false;
-                //}, 3000);
+                $timeout(function () {
+                    $scope.successNoti = false;
+                    $scope.errorNoti = false;
+                }, 3000);
             }
 
         };

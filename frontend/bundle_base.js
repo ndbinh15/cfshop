@@ -16659,6 +16659,50 @@ Check your Browserslist config to be sure that your targets are set up correctly
     var app = angular.module('cfshop', ['ngRoute']);
 
 
+    app.service('dataService', [function () {
+
+        return {
+            setData: function (key, data) {
+                localStorage.setItem(key, JSON.stringify(data));
+            },
+            getData: function (key) {
+                var storedData = localStorage.getItem(key);
+                return storedData ? JSON.parse(storedData) : null;
+            },
+            clearData: function () {
+                localStorage.clear();
+            }
+        };
+    }]);
+
+    //app.factory('DataService', function () {
+    //    var EXPIRATION_KEY = 'dataExpiration';
+    //    var DATA_KEY = 'myDataKey';
+
+    //    function storeData(data, expirationMinutes) {
+    //        var expirationTimestamp = new Date().getTime() + (expirationMinutes * 60 * 1000);
+    //        localStorage.setItem(EXPIRATION_KEY, expirationTimestamp);
+    //        localStorage.setItem(DATA_KEY, JSON.stringify(data));
+    //    }
+
+    //    function getData() {
+    //        var expirationTimestamp = parseInt(localStorage.getItem(EXPIRATION_KEY));
+    //        var currentTime = new Date().getTime();
+
+    //        if (expirationTimestamp && currentTime < expirationTimestamp) {
+    //            return JSON.parse(localStorage.getItem(DATA_KEY));
+    //        } else {
+    //            // Data has expired or doesn't exist
+    //            return null;
+    //        }
+    //    }
+
+    //    return {
+    //        storeData: storeData,
+    //        getData: getData
+    //    };
+    //});
+
     app.config(["$routeProvider", "$locationProvider", function ($routeProvider, $locationProvider) {
 
         $locationProvider.html5Mode({
@@ -16685,23 +16729,58 @@ Check your Browserslist config to be sure that your targets are set up correctly
             })
             .when("/home", {
                 templateUrl: window.config.viewLocation + "/home.html",
-                controllerUrl: window.config.controllerLocation + "/home.js"
+                controllerUrl: window.config.controllerLocation + "/home.js",
+                //resolve: {
+                //    isAdmin: ['$http', function ($http) {
+                //        return $http.get('/check-role').then(function (response) {
+                //            if (response.data.success) {
+                //                return true;
+                //            } else {
+                //                return false;
+                //            }
+                //        });
+                //    }]
+                //}
             })
             .when("/home/admin", {
                 templateUrl: window.config.viewLocation + "/admin.html",
                 controllerUrl: window.config.controllerLocation + "/admin.js"
             })
             .when("/home/admin/products", {
-                templateUrl: window.config.viewLocation + "/products.html",
-                controllerUrl: window.config.controllerLocation + "/products.js"
+                templateUrl: window.config.viewLocation + "/adProducts.html",
+                controllerUrl: window.config.controllerLocation + "/adProducts.js"
+            })
+            .when("/home/admin/users", {
+                templateUrl: window.config.viewLocation + "/adUsers.html",
+                controllerUrl: window.config.controllerLocation + "/adUsers.js"
+            })
+            .when("/home/admin/orders", {
+                templateUrl: window.config.viewLocation + "/adOrders.html",
+                controllerUrl: window.config.controllerLocation + "/adOrders.js"
             })
             .when("/home/user", {
                 templateUrl: window.config.viewLocation + "/user.html",
                 controllerUrl: window.config.controllerLocation + "/user.js"
             })
-            .when("/home/user/buyproduct", {
-                templateUrl: window.config.viewLocation + "/buyproduct.html",
-                controllerUrl: window.config.controllerLocation + "/buyproduct.js"
+            .when("/home/user/listproduct", {
+                templateUrl: window.config.viewLocation + "/listproduct.html",
+                controllerUrl: window.config.controllerLocation + "/listproduct.js"
+            })
+            .when("/home/user/cart", {
+                templateUrl: window.config.viewLocation + "/userCart.html",
+                controllerUrl: window.config.controllerLocation + "/userCart.js"
+            })
+            .when("/home/user/ordered", {
+                templateUrl: window.config.viewLocation + "/userOrdered.html",
+                controllerUrl: window.config.controllerLocation + "/userOrdered.js"
+            })
+            .when("/home/user/profile", {
+                templateUrl: window.config.viewLocation + "/userProfile.html",
+                controllerUrl: window.config.controllerLocation + "/userProfile.js"
+            })
+            .when("/home/user/listproduct/product", {
+                templateUrl: window.config.viewLocation + "/product.html",
+                controllerUrl: window.config.controllerLocation + "/product.js"
             })
             .when("/commingsoon", {
                 templateUrl: window.config.baseLocation + "/commingsoon.html",
@@ -16734,18 +16813,24 @@ angular.module('cfshop')
             scope: {
                 login: "="
             },
-            controller: ['$scope', function ($scope) {
+            controller: ['$scope','$window', 'dataService', function ($scope,$window, dataService) {
                 $scope.isNavbarOpen = false;
 
                 $scope.toggleNavbar = function () {
                     $scope.isNavbarOpen = !$scope.isNavbarOpen;
                 };
+                $scope.logout = function () {
+                    dataService.clearData();
+                    $window.location.href = '/login';
+                }
+                $scope.role = dataService.getData('userRole');
+                console.log($scope.role)
             }]
         };
     });
 
 angular.module('cfshop')
-    .controller('adminController', ['$scope', '$http', function ($scope, $http) {
+    .controller('adminController', ['$scope', '$http', '$window', 'dataService', function ($scope, $http, $window, dataService) {
 
         //link page
         $scope.linkAdminProducts = "/home/admin/products"
@@ -16753,6 +16838,13 @@ angular.module('cfshop')
         $scope.linkAdminOrders = "/home/admin/orders"
         $scope.linkAdminHome = "/home/admin"
 
+
+        $scope.isAuth = false;
+        if (dataService.getData('userRole') == undefined || dataService.getData('userRole') == null || dataService.getData('userRole') == 'user') {
+            $window.location.href = '/home'
+        } else {
+            $scope.isAuth = true;
+        }
         //
         const xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
         const yValues = [55, 49, 44, 24, 55];
@@ -16777,6 +16869,7 @@ angular.module('cfshop')
         });
 
         //count product
+        $scope.countProducts = 0;
         $scope.countProducts = function () {
             $http.get('/products/count')
                 .then(function (response) {
@@ -16788,6 +16881,48 @@ angular.module('cfshop')
                 });
         };
         $scope.countProducts();
+
+        //count user
+        $scope.countUser = 0;
+        $scope.countUsers = function () {
+            $http.get('/users/count')
+                .then(function (response) {
+                    $scope.countUser = response.data;
+
+                })
+                .catch(function (error) {
+                    console.error('Error retrieving users:', error);
+                });
+        };
+        $scope.countUsers();
+
+        //count order inprogress
+        $scope.countOrderInprogress = 0;
+        $scope.countOrderInprogress = function () {
+            $http.get('/orders/countInprogress')
+                .then(function (response) {
+                    $scope.countOrderInprogress = response.data;
+
+                })
+                .catch(function (error) {
+                    console.error('Error retrieving order:', error);
+                });
+        };
+        $scope.countOrderInprogress();
+
+        //count order completed
+        $scope.countOrderCompleted = 0;
+        $scope.countOrderCompleted = function () {
+            $http.get('/orders/countCompleted')
+                .then(function (response) {
+                    $scope.countOrderCompleted = response.data;
+
+                })
+                .catch(function (error) {
+                    console.error('Error retrieving order:', error);
+                });
+        };
+        $scope.countOrderCompleted();
 
         $scope.navChoose = false;
         $scope.contactNav = function () {
@@ -16804,67 +16939,285 @@ angular.module('cfshop')
         };
     }]);
 angular.module('cfshop')
-    .controller('homeController', ['$scope', '$http', function ($scope, $http) {
-        $scope.linkHomeAdmin = "/home/admin"
-        // $scope.linkHomeUser = "/home/user"
-        $scope.linkHomeUser = "/home/user"
+    .controller('listProductController', ['$scope', '$http', function ($scope, $http) {
+
+        $scope.readProducts = [];
+        $scope.getProducts = function () {
+            $http.get('/products/get')
+                .then(function (response) {
+                    console.log(response)
+                    $scope.readProducts = response.data;
+                    //$scope.totalPages = Math.ceil($scope.readProducts.length / $scope.itemsPerPage);
+                    // Assign product numbers to each product
+                    //$scope.readProducts.forEach(function (product, index) {
+                    //    product.productNumber = index + 1;
+                    //});
+                    //$scope.updateDisplayedProducts();
+                })
+                .catch(function (error) {
+                    console.error('Error retrieving products:', error);
+                });
+        };
+        $scope.getProducts();
     }])
 
 angular.module('cfshop')
-    .controller('loginController', ['$scope', '$http', '$window','$timeout', function ($scope, $http, $window, $timeout) {
-        $scope.login = function () {
-            $scope.login = false;
-            let username = $scope.username;
-            let password = $scope.password;
+    .controller('fgpassController', ['$scope', '$http', '$window', function ($scope, $http, $window) {
+        //$scope.login = function () {
+        //    $scope.login = false;
+        //    let username = $scope.username;
+        //    let password = $scope.password;
 
-            // let hashedPassword = hashPassword(password);
-            let hashedPassword = password;
+        //    // let hashedPassword = hashPassword(password);
+        //    let hashedPassword = password;
 
-            $http
-                .post('/login/login', { username: username, password: hashedPassword })
-                .then(function (response) {
-                    console.log(response);
-                    if (response.status == 200) {
-                        $scope.success = 'Login Success';
-                        $scope.error = null;
-                        $scope.login = true;
-                        $timeout(function () {
-                            $window.location.href = '/home'
-                        }, 1000);
+        //    $http
+        //        .post('/login/login', { username: username, password: hashedPassword })
+        //        .then(function (response) {
+        //            console.log(response);
+        //            if (response.status == 200) {
+        //                $scope.success = 'Login Success';
+        //                $scope.error = null;
+        //                $scope.login = true;
+        //                $window.location.href = '/home'
+        //            } else {
+        //                $scope.error = 'Invalid login';
+        //            }
+        //        })
+        //        .catch(function (error) {
+        //            // Display error message on login page
+        //            $scope.error = 'Invalid login';
+        //        });
+        //};
 
-                    } else {
+        //function hashPassword(password) {
+        //    const bcrypt = dcodeIO.bcrypt;
+        //    const saltRounds = 10;
+        //    const salt = bcrypt.genSaltSync(saltRounds);
+        //    const hashedPassword = bcrypt.hashSync(password, salt);
+        //    console.log('hashedPassword', hashedPassword)
+        //    return hashedPassword;
+        //}
+    }])
+angular.module('cfshop')
+    .controller('homeController', ['$rootScope', '$scope', '$http', '$window', 'dataService',
+        function ($rootScope, $scope, $http, $window, dataService) {
+            $scope.linkHomeAdmin = "/home/admin"
+            // $scope.linkHomeUser = "/home/user"
+            $scope.linkHomeUser = "/home/user"
+
+            $scope.isAuth = false;
+            if (dataService.getData('userID') == undefined || dataService.getData('userID') == null) {
+                $window.location.href = '/login'
+            } else {
+                $scope.isAuth = true;
+            }
+            //$scope.user = {};
+            //$scope.checkRole = function () {
+            //    var userId = $scope.user.id;
+
+            //    $http.get("/check-role?id=" + userId)
+            //        .then(function (response) {
+            //            if (response.data?.isAdmin == true) {
+            //                $scope.isAdmin = true;
+            //            } else if (response.data?.isUser == true) {
+            //                $scope.isUser = false;
+            //            } else {
+            //                $scope.isAdmin = false;
+            //                $scope.isUser = false;
+            //            }
+            //        }, function (error) {
+            //            alert(error.message);
+            //        });
+            //};
+        }])
+
+angular.module('cfshop')
+    .controller('loginController', ['$rootScope', '$scope', '$http', '$window', '$timeout', '$location','dataService',
+        function ($rootScope, $scope, $http, $window, $timeout, $location, dataService) {
+            $scope.login = function () {
+                //$scope.login = false;
+                let username = $scope.username;
+                let password = $scope.password;
+
+                // let hashedPassword = hashPassword(password);
+                let hashedPassword = password;
+
+                $http
+                    .post('/login/login', { username: username, password: hashedPassword })
+                    .then(function (response) {
+                        console.log(response);
+                        if (response.status == 200) {
+                            $scope.success = 'Login Success';
+                            $scope.error = null;
+                            //$scope.login = true;
+                            dataService.setData('userID', response.data.ID);
+                            dataService.setData('userRole', response.data.RL);
+
+                            $timeout(function () {
+                                $window.location.href = '/home';
+                                //$location.path('/home')
+                            }, 1000);
+
+                        } else {
+                            $scope.error = 'Invalid Login';
+                            $timeout(function () {
+                                $window.location.href = '/login'
+                            }, 1000);
+                        }
+                    })
+                    .catch(function (error) {
+                        // Display error message on login page
                         $scope.error = 'Invalid Login';
                         $timeout(function () {
                             $window.location.href = '/login'
                         }, 1000);
-                    }
+                    });
+            };
+            function hashPassword(password) {
+                const bcrypt = dcodeIO.bcrypt;
+                const saltRounds = 10;
+                const salt = bcrypt.genSaltSync(saltRounds);
+                const hashedPassword = bcrypt.hashSync(password, salt);
+                console.log('hashedPassword', hashedPassword)
+                return hashedPassword;
+            }
+
+            //$rootScope.isAdmin = function () {
+            //    return $scope.user.role == "admin";
+            //};
+
+            //$rootScope.isUser = function () {
+            //    return $scope.user.role == "user";
+            //};
+        }])
+angular.module('cfshop')
+    .controller('productController', ['$scope', '$http', '$window', '$timeout', 'dataService', function ($scope, $http, $window, $timeout, dataService) {
+
+        //link page /home/user/
+        $scope.linkUserProfile = "/commingsoon"
+        $scope.linkUserCart = "/commingsoon"
+        $scope.linkUserBuy = "/home/user/listproduct"
+        $scope.linkUserOrdered = "/commingsoon"
+        $scope.linkUserTracking = "/commingsoon"
+
+        const id = new URLSearchParams(window.location.search).get("id");
+        $scope.errorID = true;
+        $scope.product = [];
+        $scope.getProduct = function (id) {
+            $http.get('/products?id=' + id)
+                .then(function (response) {
+                    console.log(response);
+                    $scope.product = response.data;
+                    $scope.errorID = false;
                 })
                 .catch(function (error) {
-                    // Display error message on login page
-                    $scope.error = 'Invalid Login';
-                    $timeout(function () {
-                        $window.location.href = '/login'
-                    }, 1000);
+                    console.error('Error retrieving products:', error);
+                    $window.location.href = '/error'
                 });
         };
-        function hashPassword(password) {
-            const bcrypt = dcodeIO.bcrypt;
-            const saltRounds = 10;
-            const salt = bcrypt.genSaltSync(saltRounds);
-            const hashedPassword = bcrypt.hashSync(password, salt);
-            console.log('hashedPassword', hashedPassword)
-            return hashedPassword;
+        $scope.getProduct(id);
+
+        $scope.buyQuantity = 1;
+        $scope.addToCart = function () {
+            if ($scope.buyQuantity != undefined && $scope.buyQuantity != null && $scope.buyQuantity > 0) {
+                var cartRequest = {
+                    userId: dataService.getData('userID'),
+                    items: [
+                        { productId: id, quantity: $scope.buyQuantity }
+                        // Add more items if needed
+                    ]
+                };
+                console.log(cartRequest)
+                $http.post('/cart/add', cartRequest)
+                    .then(function (response) {
+                        $scope.successMess = "Add to cart successfully";
+                        $scope.successNoti = true;
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        $scope.errorNoti = true;
+                        $scope.errorMess = "Failed to add to cart: " + response.data.message;
+                        console.log('Error:', error);
+                    });
+                $timeout(function () {
+                    $scope.successNoti = false;
+                    $scope.errorNoti = false;
+                }, 2000);
+            } else {
+                $scope.errorNoti = true;
+                $scope.errorMess = "Invalid quantity";
+                $timeout(function () {
+                    $scope.errorNoti = false;
+                }, 2000);
+            }
+
+        };
+
+
+        $scope.goBackListProduct = function () {
+            $window.location.href = '/home/user/listproduct'
         }
+        $scope.goToCart = function () {
+            $window.location.href = '/home/user/cart'
+        }
+    }])
+
+angular.module('cfshop')
+    .controller('signupController', ['$scope', '$http', '$window', '$timeout', function ($scope, $http, $window, $timeout) {
+        // add user
+        $scope.inValidPassword = false;
+        $scope.successNoti = false;
+        $scope.errorNoti = false;
+        $scope.user = {};
+
+        $scope.register = function () {
+            if ($scope.user.confirmPassword !== $scope.user.password) {
+                $scope.inValidPassword = true;
+                $scope.user.confirmPassword = "";
+            } else {
+                $scope.inValidPassword = false;
+
+                $http.post('/user/register', $scope.user)
+                    .then(function (response) {
+                        console.log(response);
+                        if (response.data && response.data.success) {
+                            $scope.successMess = "User register successfully";
+                            $scope.user = {}; // Clear the form fields
+                            $scope.successNoti = true;
+                            $timeout(function () {
+                                $window.location.href = '/login'
+                            }, 2000);
+
+                        } else {
+                            $scope.errorNoti = true;
+                            $scope.errorMess = "Failed to register User:" + response.data.message;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error)
+                        $scope.errorNoti = true;
+                        $scope.errorMess = 'Error register user: ' + error.data;
+                    });
+                $timeout(function () {
+                    $scope.successNoti = false;
+                    $scope.errorNoti = false;
+                }, 3000);
+            }
+
+        };
+
     }])
 angular.module('cfshop')
     .controller('userController', ['$scope', '$http', function ($scope, $http) {
 
         //link page /home/user/
-        $scope.linkUserProfile = "/commingsoon"
-        $scope.linkUserCart = "/commingsoon"
-        $scope.linkUserBuy = "/home/user/buyproduct"
-        $scope.linkUserOrdered = "/commingsoon"
+        $scope.linkUserProfile = "/home/user/profile"
+        $scope.linkUserCart = "/home/user/cart"
+        $scope.linkUserBuy = "/home/user/listproduct"
+        $scope.linkUserOrdered = "/home/user/ordered"
         $scope.linkUserTracking = "/commingsoon"
+
     }])
 
 angular.module('cfshop')

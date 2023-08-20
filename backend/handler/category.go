@@ -32,10 +32,8 @@ func GetAllCategory(w http.ResponseWriter, r *http.Request) {
 	} else {
 		log.Println("$GET all category success")
 	}
-	// Get the MongoDB collection for products
 	categoryCollection := db.GetCategoryCollection()
 
-	// Fetch all products from the collection
 	cursor, err := categoryCollection.Find(r.Context(), bson.M{})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -43,7 +41,6 @@ func GetAllCategory(w http.ResponseWriter, r *http.Request) {
 	}
 	defer cursor.Close(r.Context())
 
-	// Collect products in a slice
 	var categories []Category
 	for cursor.Next(r.Context()) {
 		var category Category
@@ -59,7 +56,6 @@ func GetAllCategory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Encode categories as JSON and send the response
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(categories)
 	if err != nil {
