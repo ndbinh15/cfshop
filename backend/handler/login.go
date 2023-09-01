@@ -33,12 +33,22 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	username := loginRequest.Username
 	password := loginRequest.Password
 
-	err = AuthenticateUser(username, password)
+	var id string
+	var role string
+
+	id, role, err = AuthenticateUser(username, password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	// Redirect to the home page on successful login
-	// http.Redirect(w, r, "../fontend/home.html", http.StatusFound)
+	// Return a success response
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	response := map[string]interface{}{
+		"success": true,
+		"ID":      id,
+		"RL":      role,
+	}
+	json.NewEncoder(w).Encode(response)
 }

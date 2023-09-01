@@ -1,4 +1,4 @@
-<div ng-controller="productController">
+<div ng-controller="adProductController">
 
     <!-- navbar -->
     <div id="mySidenav"
@@ -42,68 +42,60 @@
         <div class="my-4 flex flex-wrap">
             <div class="w-full lg:w-1/4 px-4 mb-4">
                 <!-- small box -->
+                <div class="bg-yellow-500 rounded-lg overflow-hidden border border-yellow-700">
+                    <div class="p-4">
+                        <h3 class="text-2xl font-bold text-white" ng-if="countUser.count">{{countUser.count}}</h3>
+                        <h3 class="text-2xl font-bold text-white" ng-if="!countUser.count">0</h3>
+                        <p class="text-white">Users</p>
+                    </div>
+                    <div class="px-4 py-2 bg-white">
+                        <i class="ion ion-bag"></i>
+                        <a ng-href="{{linkAdminUsers}}" class="text-yellow-500">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-1/4 px-4 mb-4">
+                <!-- small box -->
+                <div class="bg-orange-500 rounded-lg overflow-hidden border border-orange-700">
+                    <div class="p-4">
+                        <h3 class="text-2xl font-bold text-white" ng-if="countProducts.count">{{countProducts.count}}</h3>
+                        <h3 class="text-2xl font-bold text-white" ng-if="!countProducts.count">0</h3>
+                        <p class="text-white">Products </p>
+                    </div>
+                    <div class="px-4 py-2 bg-white">
+                        <i class="ion ion-bag"></i>
+                        <a ng-href="{{linkAdminProducts}}" class="text-orange-500 ">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-1/4 px-4 mb-4">
+                <!-- small box -->
                 <div class="bg-blue-500 rounded-lg overflow-hidden border border-blue-700">
                     <div class="p-4">
-                        <h3 class="text-2xl font-bold text-white">Na/N</h3>
+                        <h3 class="text-2xl font-bold text-white" ng-if="countOrderInprogress.count">{{countOrderInprogress.count}}</h3>
+                        <h3 class="text-2xl font-bold text-white" ng-if="!countOrderInprogress.count">0</h3>
                         <p class="text-white">New Orders</p>
                     </div>
                     <div class="px-4 py-2 bg-white">
                         <i class="ion ion-bag"></i>
-                        <a href="#" class="text-blue-500">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a ng-href="{{linkAdminOrders}}" class="text-blue-500">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
             </div>
 
             <div class="w-full lg:w-1/4 px-4 mb-4">
                 <!-- small box -->
-                <div class="bg-orange-500 rounded-lg overflow-hidden border border-blue-700">
+                <div class="bg-green-500 rounded-lg overflow-hidden border border-green-700">
                     <div class="p-4">
-                        <h3 class="text-2xl font-bold text-white" ng-if="countProducts.count">
-                            {{countProducts.count}}
-                        </h3>
-                        <h3 class="text-2xl font-bold text-white" ng-if="!countProducts.count">0</h3>
-                        <p class="text-white">
-                            Products
-                            <button type="button" class="duration-300 hover:text-blue-500" ng-click="refreshOriginPage()">
-                                <i class="fa-solid fa-rotate-right cursor-pointer"></i>
-                            </button>
-                        </p>
-
-
-                    </div>
-                    <div class="px-4 py-2 bg-white">
-                        <i class="ion ion-bag"></i>
-                        <a ng-href="{{linkAdminProducts}}" class="text-blue-500">
-                            More info <i class="fas fa-arrow-circle-right"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="w-full lg:w-1/4 px-4 mb-4">
-                <!-- small box -->
-                <div class="bg-red-700 rounded-lg overflow-hidden border border-blue-700">
-                    <div class="p-4">
-                        <h3 class="text-2xl font-bold text-white">Na/N</h3>
-                        <p class="text-white">Request Cancel Orders</p>
-                    </div>
-                    <div class="px-4 py-2 bg-white">
-                        <i class="ion ion-bag"></i>
-                        <a href="#" class="text-blue-500">More info <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="w-full lg:w-1/4 px-4 mb-4">
-                <!-- small box -->
-                <div class="bg-green-500 rounded-lg overflow-hidden border border-blue-700">
-                    <div class="p-4">
-                        <h3 class="text-2xl font-bold text-white">Na/N</h3>
+                        <h3 class="text-2xl font-bold text-white" ng-if="countOrderCompleted.count">{{countOrderCompleted.count}}</h3>
+                        <h3 class="text-2xl font-bold text-white" ng-if="!countOrderCompleted.count">0</h3>
                         <p class="text-white">Orders Completed</p>
                     </div>
                     <div class="px-4 py-2 bg-white">
                         <i class="ion ion-bag"></i>
-                        <a href="#" class="text-blue-500">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        <a ng-href="{{linkAdminOrders}}" class="text-green-500">More info <i class="fas fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
             </div>
@@ -132,6 +124,7 @@
                         <thead>
                             <tr>
                                 <th class="border-b-2 border-gray-300 px-4 py-2 text-center max-w-[50px]">No.</th>
+                                <th class="border-b-2 border-gray-300 px-4 py-2 text-center max-w-[50px]">ID</th>
                                 <th class="border-b-2 border-gray-300 px-4 py-2 text-center max-w-[150px]">Name</th>
                                 <th class="border-b-2 border-gray-300 px-4 py-2 text-center max-w-[100px]">Price</th>
                                 <th class="border-b-2 border-gray-300 px-4 py-2 text-center max-w-[100px]">Quantity</th>
@@ -143,6 +136,7 @@
                         <tbody>
                             <tr ng-repeat="product in displayedProducts track by $index" class="hover:bg-gray-100">
                                 <td class="border-b border-gray-300 px-4 py-2 max-w-[50px] text-center">{{ product.productNumber }}</td>
+                                <td class="border-b border-gray-300 px-4 py-2 max-w-[50px] text-center">{{ product._id.slice(-6) }}</td>
                                 <td class="border-b border-gray-300 px-4 py-2 max-w-[150px] text-center">{{ product.name }}</td>
                                 <td class="border-b border-gray-300 px-4 py-2 max-w-[100px] text-center">{{ product.price }}</td>
                                 <td class="border-b border-gray-300 px-4 py-2 max-w-[100px] text-center">{{ product.quantity }}</td>
@@ -151,18 +145,26 @@
                                 <td class="border-b border-gray-300 px-4 py-2 max-w-[150px] text-center">
                                     <button type="button"
                                             class="px-2 py-1 bg-yellow-500 text-white rounded transition-colors duration-300 hover:bg-yellow-700 w-[70px]"
-                                            ng-click="">
+                                            ng-click="updateProductSection(product._id)">
                                         Update
                                     </button>
                                     <button type="button"
                                             class="px-2 py-1 bg-red-500 text-white rounded transition-colors duration-300 hover:bg-red-700 w-[70px]"
-                                            ng-click="deleteProduct(product.name)">
+                                            ng-click="deleteProduct(product._id)">
                                         Delete
                                     </button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                    <div class="alert success bg-green-500 border-l-4 border-green-700 text-white p-4 mb-4"
+                         ng-if="successNoti">
+                        <strong>Success!</strong> {{successMess}}
+                    </div>
+                    <div class="alert success bg-red-500 border-l-4 border-red-700 text-white p-4 mb-4"
+                         ng-if="errorNoti">
+                        <strong>Error</strong> {{errorMess}}
+                    </div>
 
                     <div class="mt-8">
 
@@ -285,14 +287,14 @@
                                     required>
                                 <option value="">Select a name of product</option>
                                 <option ng-repeat="product2 in readProducts track by $index" value="{{ product2.name }}">
-                                    {{ product2.name }}
+                                    {{product2._id.slice(-6)}} {{ product2.name}}
                                 </option>
                             </select>
                         </div>
 
                         <div class="mb-4">
                             <label for="quantity" class="block text-gray-700 font-semibold">(*)Quantity:</label>
-                            <input type="number" id="quantity" ng-model="product2.quantity"
+                            <input type="number" id="quantity" ng-model="product2.quantity" min="0" step="1"
                                    class="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:border-blue-500"
                                    required>
                         </div>
@@ -321,39 +323,115 @@
                 </div>
             </div>
 
-            <!-- update -->
-            <!-- <div class="border border-gray-300 rounded">
+            <!--update-->
+            <div class="border border-gray-300 rounded">
                 <div class="p-4 flex justify-between items-center bg-gray-100">
                     <h3 class="text-lg font-bold">Update Product</h3>
-                    <div class="space-x-2">
-                        <button type="button"
-                            class="px-2 py-1 bg-sky-500 text-white rounded transition-colors duration-300 hover:bg-sky-700"
-                            ng-click="openUpdate()">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
                 </div>
                 <div class="p-4" ng-class="{ 'hidden': isHiddenUpdate }">
+                    <form ng-submit="productUpdate()" class=" bg-white p-8 rounded shadow-md">
+
+                        <div class="mb-4">
+                            <label for="name" class="block text-gray-700 font-semibold">ID:</label>
+                            <input type="text" id="ID" ng-model="updatedProduct._id" value="updateProduct._id"
+                                   class="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:border-blue-500"
+                                   disabled>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="name" class="block text-gray-700 font-semibold">(*)Name:</label>
+                            <input type="text" id="name" ng-model="updatedProduct.name" value="updateProduct.name"
+                                   class="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:border-blue-500"
+                                   required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="price" class="block text-gray-700 font-semibold">(*)Price:</label>
+                            <input type="number" id="price" ng-model="updatedProduct.price" step="0.01" min="0" value="updateProduct.price"
+                                   class="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:border-blue-500"
+                                   required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="quantity" class="block text-gray-700 font-semibold">Quantity:</label>
+                            <input type="number" id="quantity" ng-model="updatedProduct.quantity" value="updateProduct.quantity"
+                                   class="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:border-blue-500"
+                                   disabled>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="price" class="block text-gray-700 font-semibold">Image:</label>
+                            <input type="text" id="price" ng-model="updatedProduct.image" placeholder="default.jpg" value="updateProduct.image"
+                                   class="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:border-blue-500">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="price" class="block text-gray-700 font-semibold">Ingredients:</label>
+                            <input type="text" id="ingredients" ng-model="updatedProduct.ingredients" value="updateProduct.ingredients"
+                                   class="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:border-blue-500">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="availability" class="block text-gray-700 font-semibold">Availability:</label>
+                            <input type="checkbox" id="availability" name="availability" ng-model="updatedProduct.availability">
+                            <span class="capitalize">{{updateProduct.availability}}</span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="description" class="block text-gray-700 font-semibold">Description:</label>
+                            <textarea id="description" ng-model="updatedProduct.description" value="updateProduct.description"
+                                      class="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:border-blue-500"></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="category" class="block text-gray-700 font-semibold">(*)Category:</label>
+                            <select id="category" ng-model="updatedProduct.category"
+                                    class="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:border-blue-500"
+                                    required>
+                                <option value="updateProduct.category"></option>
+                                <option ng-repeat="category in categories track by $index" value="{{ category.name }}">
+                                    {{ category.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="alert success bg-green-500 border-l-4 border-green-700 text-white p-4 mb-4"
+                             ng-if="successNoti">
+                            <strong>Success!</strong> {{successMess}}
+                        </div>
+                        <div class="alert success bg-red-500 border-l-4 border-red-700 text-white p-4 mb-4"
+                             ng-if="errorNoti">
+                            <strong>Error</strong> {{errorMess}}
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit" ng-click="refreshPage()"
+                                    class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded duration-300">
+                                Update Product
+                            </button>
+                        </div>
+                    </form>
 
                 </div>
-            </div> -->
-            <!-- delete -->
-            <!-- <div class="border border-gray-300 rounded">
-                <div class="p-4 flex justify-between items-center bg-gray-100">
-                    <h3 class="text-lg font-bold">Delete Product</h3>
-                    <div class="space-x-2">
-                        <button type="button"
-                            class="px-2 py-1 bg-sky-500 text-white rounded transition-colors duration-300 hover:bg-sky-700"
-                            ng-click="openDelete()">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="p-4" ng-class="{ 'hidden': isHiddenDelete }">
-
-
-                </div>
-
-            </div> -->
+            </div>
         </div>
+        <!-- delete -->
+        <!-- <div class="border border-gray-300 rounded">
+            <div class="p-4 flex justify-between items-center bg-gray-100">
+                <h3 class="text-lg font-bold">Delete Product</h3>
+                <div class="space-x-2">
+                    <button type="button"
+                        class="px-2 py-1 bg-sky-500 text-white rounded transition-colors duration-300 hover:bg-sky-700"
+                        ng-click="openDelete()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4" ng-class="{ 'hidden': isHiddenDelete }">
+
+
+            </div>
+
+        </div> -->
     </div>
+</div>
+</div>

@@ -10,13 +10,14 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"golang.org/x/crypto/bcrypt"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type User struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty"`
 	Name        string             `bson:"name"`
 	UserName    string             `bson:"username"`
+	Role        string             `bson:"role"`
 	Email       string             `bson:"email"`
 	PhoneNumber string             `bson:"phonenumber"`
 	Address     string             `bson:"address"`
@@ -32,7 +33,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		log.Println("$POST CreateUser success")
 	}
 
-	// Parse the request body to get the product data
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
@@ -41,13 +41,28 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userCollection := db.GetUserCollection()
+	// Check if the username is unique
+	filter := bson.M{"username": user.UserName}
+	count, err := userCollection.CountDocuments(context.TODO(), filter)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if count > 0 {
+		http.Error(w, "Username already exists", http.StatusBadRequest)
+		return
+	}
+
+	userID := primitive.NewObjectID()
+	user.ID = userID
+	user.Role = "user"
+
 	_, err = userCollection.InsertOne(r.Context(), user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Return a success response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	response := map[string]interface{}{
@@ -57,56 +72,202 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func UpdateUser(user User) error {
-	collection := db.GetUserCollection()
+func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 
-	filter := bson.M{"_id": user.ID}
-	update := bson.M{"$set": bson.M{
-		"name":        user.Name,
-		"email":       user.Email,
-		"phonenumber": user.PhoneNumber,
-		"address":     user.Address,
-	}}
-
-	_, err := collection.UpdateOne(context.TODO(), filter, update)
-	if err != nil {
-		log.Println("Failed to update user:", err)
-		return err
+	if r.Method != "GET" {
+		http.Error(w, "Method GetAllUsers not allowed", http.StatusMethodNotAllowed)
+		return
+	} else {
+		log.Println("$GET GetAllUsers success")
 	}
 
-	return nil
+	userCollection := db.GetUserCollection()
+
+	cursor, err := userCollection.Find(r.Context(), bson.M{})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer cursor.Close(r.Context())
+
+	// Collect users in a slice
+	var users []User
+	for cursor.Next(r.Context()) {
+		var user User
+		err := cursor.Decode(&user)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		users = append(users, user)
+	}
+	if err := cursor.Err(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(users)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
-func DeleteUser(id string) error {
-	collection := db.GetUserCollection()
+func GetUserRole(w http.ResponseWriter, r *http.Request) {
 
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		log.Println("Invalid object ID:", err)
-		return err
+	if r.Method != "GET" {
+		http.Error(w, "Method GetUserRole not allowed", http.StatusMethodNotAllowed)
+		return
+	} else {
+		log.Println("$GET GetUserRole success")
 	}
 
-	filter := bson.M{"_id": objID}
+	userId := r.URL.Query().Get("id")
 
-	_, err = collection.DeleteOne(context.TODO(), filter)
+	userCollection := db.GetUserCollection()
+	user := User{}
+	err := userCollection.FindOne(r.Context(), bson.M{"_id": userId}).Decode(&user)
 	if err != nil {
-		log.Println("Failed to delete user:", err)
-		return err
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	return nil
+	role := user.Role
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(role)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
-func hashPassword(password string) (string, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
-	if err != nil {
-		return "", err
+func GetUserCount(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method GetOrdersByUserID not allowed", http.StatusMethodNotAllowed)
+		return
 	}
-	return string(hashedPassword), nil
-	// return password, nil
+
+	userCollection := db.GetUserCollection()
+
+	count, err := userCollection.CountDocuments(r.Context(), bson.M{})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	response := struct {
+		Count int64 `json:"count"`
+	}{
+		Count: count,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
-func AuthenticateUser(username, password string) error {
+func GetUserById(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Method GetUserById not allowed", http.StatusMethodNotAllowed)
+		return
+	} else {
+		log.Println("$GET GetUserById success")
+	}
+
+	id := r.URL.Query().Get("id")
+	userID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	userCollection := db.GetUserCollection()
+
+	filter := bson.M{"_id": userID}
+	log.Println(filter)
+	var user User
+	err = userCollection.FindOne(r.Context(), filter).Decode(&user)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			http.Error(w, "User not found", http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func UpdateUserByID(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "PUT" {
+		http.Error(w, "Method UpdateUserByID not allowed", http.StatusMethodNotAllowed)
+		return
+	} else {
+		log.Println("$PUT UpdateUserByID success")
+	}
+
+	var updatedUser User
+	err := json.NewDecoder(r.Body).Decode(&updatedUser)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	userCollection := db.GetUserCollection()
+
+	userID, err := primitive.ObjectIDFromHex(updatedUser.ID.Hex())
+	if err != nil {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	filter := bson.M{"_id": userID}
+	existingUser := userCollection.FindOne(r.Context(), filter)
+
+	if existingUser.Err() == nil {
+		update := bson.M{"$set": updatedUser}
+		_, err := userCollection.UpdateOne(r.Context(), filter, update)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		log.Println("User not found")
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	response := map[string]interface{}{
+		"success": true,
+		"message": "Product updated successfully",
+	}
+	json.NewEncoder(w).Encode(response)
+}
+
+// func hashPassword(password string) (string, error) {
+// 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	return string(hashedPassword), nil
+// 	// return password, nil
+// }
+
+func AuthenticateUser(username, password string) (string, string, error) {
 	collection := db.GetUserCollection()
 
 	// Find the user with the provided username
@@ -115,7 +276,7 @@ func AuthenticateUser(username, password string) error {
 	err := collection.FindOne(context.TODO(), filter).Decode(&user)
 	if err != nil {
 		log.Println("User not found:", err)
-		return errors.New("Invalid username or password")
+		return "", "", errors.New("Invalid username or password")
 	}
 	// Verify the password
 	// err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
@@ -127,9 +288,9 @@ func AuthenticateUser(username, password string) error {
 
 	if user.Password != password {
 		log.Println("invalid pass")
-		return errors.New("Invalid")
+		return "", "", errors.New("Invalid")
 	}
 
 	log.Println("User authenticated successfully")
-	return nil
+	return user.ID.Hex(), user.Role, nil
 }

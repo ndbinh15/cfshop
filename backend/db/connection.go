@@ -25,23 +25,32 @@ func ConnectDB() {
 }
 
 func GetUserCollection() *mongo.Collection {
-	// Access the desired database and collection
-	db := client.Database("myDatabase")  // Replace 'mydatabase' with your actual database name
-	collection := db.Collection("users") // Replace 'users' with your actual collection name
+	db := client.Database("myDatabase2")
+	collection := db.Collection("users")
 
 	return collection
 }
 func GetProductCollection() *mongo.Collection {
-	// Access the desired database and collection
-	db := client.Database("myDatabase")     // Replace 'mydatabase' with your actual database name
-	collection := db.Collection("products") // Replace 'users' with your actual collection name
+	db := client.Database("myDatabase2")
+	collection := db.Collection("products")
 
 	return collection
 }
 func GetCategoryCollection() *mongo.Collection {
-	// Access the desired database and collection
-	db := client.Database("myDatabase")       // Replace 'mydatabase' with your actual database name
-	collection := db.Collection("categories") // Replace 'users' with your actual collection name
+	db := client.Database("myDatabase2")
+	collection := db.Collection("categories")
+
+	return collection
+}
+func GetCartCollection() *mongo.Collection {
+	db := client.Database("myDatabase2")
+	collection := db.Collection("cart")
+
+	return collection
+}
+func GetOrderCollection() *mongo.Collection {
+	db := client.Database("myDatabase2")
+	collection := db.Collection("order")
 
 	return collection
 }

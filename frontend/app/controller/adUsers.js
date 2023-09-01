@@ -1,5 +1,5 @@
 angular.module('cfshop')
-    .controller('productController', ['$scope', '$http', '$timeout', '$window', function ($scope, $http, $timeout, $window) {
+    .controller('adUserController', ['$scope', '$http', '$timeout', '$window', function ($scope, $http, $timeout, $window) {
         $scope.linkAdminProducts = "/home/admin/products";
         $scope.linkAdminUsers = "/home/admin/users";
         $scope.linkAdminOrders = "/home/admin/orders";
@@ -20,155 +20,174 @@ angular.module('cfshop')
             }, 1000);
         }
 
-        // count product
-        $scope.countProducts = function () {
-            $http.get('/products/count')
+        //count order inprogress
+        $scope.countOrderInprogress = 0;
+        $scope.countOrderInprogress = function () {
+            $http.get('/orders/countInprogress')
                 .then(function (response) {
-                    $scope.countProducts = response.data;
+                    $scope.countOrderInprogress = response.data;
 
                 })
                 .catch(function (error) {
-                    console.error('Error count products:', error);
+                    console.error('Error retrieving users:', error);
                 });
         };
-        $timeout(function () {
-            $scope.countProducts();
-        }, 1000);
+        $scope.countOrderInprogress();
 
-        // add product
-        $scope.successNoti = false;
-        $scope.errorNoti = false;
-        $scope.product = {};
-        $scope.createProduct = function () {
-            $http.post('/products/add', $scope.product)
+        //count order completed
+        $scope.countOrderCompleted = 0;
+        $scope.countOrderCompleted = function () {
+            $http.get('/orders/countCompleted')
                 .then(function (response) {
-                    console.log(response);
-                    if (response.data && response.data.success) {
-                        $scope.successMess = "Product created successfully";
-                        $scope.product = {}; // Clear the form fields
-                        $scope.successNoti = true;
-                    } else {
-                        $scope.errorNoti = true;
-                        $scope.errorMess = "Failed to create product:" + response.data.message;
-                    }
+                    $scope.countOrderCompleted = response.data;
+
                 })
                 .catch(function (error) {
-                    console.log(error)
-                    $scope.errorNoti = true;
-                    $scope.errorMess = 'Error creating product:' + error;
+                    console.error('Error retrieving users:', error);
                 });
-            $timeout(function () {
-                $scope.successNoti = false;
-                $scope.errorNoti = false;
-            }, 3000);
+        };
+        $scope.countOrderCompleted();
+
+        //count user
+        $scope.countUser = 0;
+        $scope.countUsers = function () {
+            $http.get('/users/count')
+                .then(function (response) {
+                    $scope.countUser = response.data;
+
+                })
+                .catch(function (error) {
+                    console.error('Error retrieving users:', error);
+                });
         };
 
-        // delete product
+        $scope.countUsers();
+
+        //count order
+        $scope.countOrder = 0;
+        $scope.countOrder = function () {
+            $http.get('/orders/count')
+                .then(function (response) {
+                    $scope.countOrder = response.data;
+
+                })
+                .catch(function (error) {
+                    console.error('Error retrieving users:', error);
+                });
+        };
+        $scope.countOrder();
+
+
+        //// delete product
+        //$scope.successNoti = false;
+        //$scope.errorNoti = false;
+        //$scope.product = {};
+        //$scope.deleteProduct = function (productName) {
+        //    $http.post('/products/delete', { name: productName })
+        //        .then(function (response) {
+        //            console.log(response);
+        //            if (response.data && response.data.success) {
+        //                $scope.successMess = "Product deleted successfully";
+        //                $scope.successNoti = true;
+        //            } else {
+        //                $scope.errorNoti = true;
+        //                $scope.errorMess = "Failed to delete product: " + response.data.message;
+        //            }
+        //        })
+        //        .catch(function (error) {
+        //            console.log(error);
+        //            $scope.errorNoti = true;
+        //            $scope.errorMess = 'Error deleting product: ' + error;
+        //        })
+        //    $timeout(function () {
+        //        $scope.successNoti = false;
+        //        $scope.errorNoti = false;
+        //        $scope.getProducts();
+        //    }, 1000);
+        //};
+
+        // update product
         $scope.successNoti = false;
         $scope.errorNoti = false;
-        $scope.product = {};
-        $scope.deleteProduct = function (productName) {
-            $http.post('/products/delete', { name: productName })
+        $scope.updateUser = {};
+
+        $scope.updateUserSection = function (userID) {
+            $scope.openUpdate();
+            $http.get('/users?id=' + userID)
+                .then(function (response) {
+                    console.log(response);
+                    $scope.updateUser = response.data;
+                    $scope.updatedUser = angular.copy($scope.updateUser);
+                })
+                .catch(function (error) {
+                    console.error('Error retrieving products:', error);
+                });
+        }
+        $scope.userUpdate = function () {
+            $http.put('/users/update', $scope.updatedUser)
                 .then(function (response) {
                     console.log(response);
                     if (response.data && response.data.success) {
-                        $scope.successMess = "Product deleted successfully";
+                        $scope.successMess = "User update successfully";
                         $scope.successNoti = true;
                     } else {
                         $scope.errorNoti = true;
-                        $scope.errorMess = "Failed to delete product: " + response.data.message;
+                        $scope.errorMess = "Failed to update user: " + response.data.message;
                     }
                 })
                 .catch(function (error) {
                     console.log(error);
                     $scope.errorNoti = true;
-                    $scope.errorMess = 'Error deleting product: ' + error;
+                    $scope.errorMess = 'Error updating user: ' + error?.data;
                 })
             $timeout(function () {
                 $scope.successNoti = false;
                 $scope.errorNoti = false;
-                $scope.getProducts();
-            }, 1000);
+                $scope.openShow();
+            }, 2000);
         };
 
-        // update product quantity
-        $scope.successNoti2 = false;
-        $scope.errorNoti2 = false;
-        $scope.product2 = {};
-        $scope.updateQuantity = function () {
-            $http.post('/products/addQuantity', $scope.product2)
-                .then(function (response) {
-                    console.log(response);
-                    if (response.data && response.data.success) {
-                        $scope.successMess2 = "Product created successfully";
-                        $scope.product2 = {}; // Clear the form fields
-                        $scope.successNoti2 = true;
-                    } else {
-                        $scope.errorNoti2 = true;
-                        $scope.errorMess2 = "Failed to create product:" + response.data.message;
-                    }
-                })
-                .catch(function (error) {
-                    $scope.errorNoti2 = true;
-                    $scope.errorMess2 = 'Error creating product:' + error;
-                });
-        };
-
-
-        //get category
-        $scope.getCategories = function () {
-            $http
-                .get('/products/categories/get')
-                .then(function (response) {
-                    $scope.categories = response.data;
-
-                })
-                .catch(function (error) {
-                    console.error('Error get categories:', error);
-                });
-        }
-
-        //show 5 products per page
-        $scope.readProducts = [];
-        $scope.displayedProducts = [];
+        //show 5 Users per page
+        $scope.readUsers = [];
+        $scope.displayedUsers = [];
         $scope.itemsPerPage = 5;
         $scope.currentPage = 1;
         $scope.totalPages = 0;
 
-        $scope.getProducts = function () {
-            $http.get('/products/get')
+        $scope.getUsers = function () {
+            $http.get('/users/get')
                 .then(function (response) {
                     console.log(response)
-                    $scope.readProducts = response.data;
-                    $scope.totalPages = Math.ceil($scope.readProducts.length / $scope.itemsPerPage);
+                    $scope.readUsers = response.data;
+                    $scope.totalPages = Math.ceil($scope.readUsers.length / $scope.itemsPerPage);
                     // Assign product numbers to each product
-                    $scope.readProducts.forEach(function (product, index) {
+                    $scope.readUsers.forEach(function (product, index) {
                         product.productNumber = index + 1;
                     });
-                    $scope.updateDisplayedProducts();
+                    $scope.updateDisplayedUsers();
                 })
                 .catch(function (error) {
-                    console.error('Error retrieving products:', error);
+                    console.error('Error retrieving Users:', error);
                 });
         };
 
-        $scope.updateDisplayedProducts = function () {
+        $scope.updateDisplayedUsers = function () {
             const startIndex = math.multiply(math.subtract($scope.currentPage, 1), $scope.itemsPerPage);
             const endIndex = startIndex + $scope.itemsPerPage;
-            $scope.displayedProducts = $scope.readProducts.slice(startIndex, endIndex);
+            $scope.displayedUsers = $scope.readUsers.slice(startIndex, endIndex);
         };
 
         $scope.previousPage = function () {
             if ($scope.currentPage > 1) {
                 $scope.currentPage--;
-                $scope.updateDisplayedProducts();
+                $scope.updateDisplayedUsers();
             }
         };
 
         $scope.nextPage = function () {
             if ($scope.currentPage < $scope.totalPages) {
                 $scope.currentPage++;
-                $scope.updateDisplayedProducts();
+                $scope.updateDisplayedUsers();
             }
         };
 
@@ -196,7 +215,7 @@ angular.module('cfshop')
         $scope.isHiddenAdd = true;
         $scope.countProduct = 0;
         $scope.openShow = function () {
-            $scope.getProducts();
+            $scope.getUsers();
             $scope.isHiddenShow = !$scope.isHiddenShow;
             $scope.isHiddenCreate = true;
             $scope.isHiddenUpdate = true;
@@ -204,7 +223,7 @@ angular.module('cfshop')
             $scope.isHiddenAdd = true;
         }
         $scope.openAdd = function () {
-            $scope.getProducts();
+            $scope.getUsers();
             $scope.isHiddenAdd = !$scope.isHiddenAdd;
             $scope.isHiddenShow = true;
             $scope.isHiddenCreate = true;

@@ -1,0 +1,71 @@
+<div class="bg-gray-100 font-sans" ng-controller="userCartController">
+
+    <div class="flex items-center justify-center h-screen" ng-show="errorID">
+        <div class="text-center">
+            <div>
+                <h1 class="text-4xl font-bold mb-4">...YOUR CART IS EMPTY...</h1>
+                <button class="w-full bg-[#744700] text-white py-2 rounded-md hover:bg-[#5d3901]" ng-click="goBackListProduct()">Go back to list product</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8" ng-hide="errorID">
+        <h1 class="text-3xl font-semibold">{{userInfo.UserName}}'s Cart </h1>
+        <p class="text-sm text-primary mb-4">ID: {{cart.userid}}</p>
+
+        <table class="w-full border-collapse">
+            <thead>
+                <tr>
+                    <th class="py-2 px-4 border border-gray-300 text-center">Product Name</th>
+                    <th class="py-2 px-4 border border-gray-300 text-center">Quantity</th>
+                    <th class="py-2 px-4 border border-gray-300 text-center">Price</th>
+                    <th class="py-2 px-4 border border-gray-300 text-center">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="pr in product track by $index" class="bg-white">
+                    <td class="py-2 px-4 border border-gray-300 text-center">{{pr.product.name}}</td>
+                    <td class="py-2 px-4 border border-gray-300 text-center">{{pr.quantity}}</td>
+                    <td class="py-2 px-4 border border-gray-300 text-center">{{pr.product.price}}</td>
+                    <td class="py-2 px-4 border border-gray-300 text-center">{{pr.price}}</td>
+                </tr>
+                <tr class="bg-gray-200">
+                    <td class="py-2 px-4 border border-gray-300 "></td>
+                    <td class="py-2 px-4 border border-gray-300 "></td>
+                    <td class="py-2 px-4 border border-gray-300 "><strong>Total</strong></td>
+                    <td class="py-2 px-4 border border-gray-300">{{totalBill}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="text-right">
+
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" ng-hide="errorID">
+            <div class="md:order-1">
+                <button ng-click="goBackListProduct()"
+                        class=" bg-[#744700] text-black border border-white py-2 px-4 mt-4 rounded-lg hover:bg-[#5d3901] hover:text-white">
+                    <i class="fa-solid fa-arrow-left"></i> List Product
+                </button>
+            </div>
+            <div class="md:order-2 text-right">
+                <button ng-click="createOrder()"
+                        class=" bg-[#744700] text-black border border-white py-2 px-4 mt-4 rounded-lg hover:bg-[#5d3901] hover:text-white">
+                    Buy Products <i class="fa-solid fa-arrow-right"></i>    
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" ng-hide="errorID">
+            <div class="md:order-1"></div>
+            <div class="md:order-2">
+                <div class="alert success bg-green-500 border-l-4 border-green-700 text-white p-4 mb-4" ng-if="successNoti">
+                    <strong>Success!</strong> {{successMess}}
+                </div>
+                <div class="alert success bg-red-500 border-l-4 border-red-700 text-white p-4 mb-4" ng-if="errorNoti">
+                    <strong>Error</strong> {{errorMess}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

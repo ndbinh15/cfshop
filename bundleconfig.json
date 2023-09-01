@@ -17,9 +17,12 @@
       "frontend/app/base/header.js",
 
       "frontend/app/controller/admin.js",
+      "frontend/app/controller/listproduct.js",
+      "frontend/app/controller/fgpass.js",
       "frontend/app/controller/home.js",
       "frontend/app/controller/login.js",
       "frontend/app/controller/product.js",
+      "frontend/app/controller/signup.js",
       "frontend/app/controller/user.js",
       "frontend/app/controller/welcome.js"
     ]
